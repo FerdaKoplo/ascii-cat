@@ -59,13 +59,10 @@ const AsciiCat = () => {
           char = "@";
           color = "#00ffff"; // Cyan Bell
         } else if (index <= 21) {
-          char = char;
           color = "#ffffff"; // White Chest
         } else if (index <= 53) {
-          char = char;
           color = "#ffffff"; // White Paws and Feet Toes
         } else if (index <= 61) {
-          char = char;
           color = "#ffcc00"; // Yellow Belly Band
         }
 
