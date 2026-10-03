@@ -13,13 +13,15 @@ import { getShadeChar } from "../libs/lighting.lib";
 import { girlMeshes } from "../constants/girl-punk.constant";
 import { catMeshes } from "../constants/blooby-cat.constant";
 
-const SCREEN_WIDTH = 80;
-const SCREEN_HEIGHT = 100;
+interface AsciiRenderMainProps {
+  activeChar: "girl" | "cat";
+}
 
-const AsciiRenderMain = () => {
+const SCREEN_WIDTH = 70;
+const SCREEN_HEIGHT = 60;
+
+const AsciiRenderMain: React.FC<AsciiRenderMainProps> = ({ activeChar }) => {
   const preRef = useRef<HTMLPreElement>(null);
-
-  const [activeChar, setActiveChar] = useState<"girl" | "cat">("girl");
 
   const currentVertices = activeChar === "girl" ? girlVertices : catVertices;
   const currentMeshes = activeChar === "girl" ? girlMeshes : catMeshes;
@@ -116,44 +118,15 @@ const AsciiRenderMain = () => {
   }, [currentVertices, currentMeshes]);
 
   return (
-    <div
-      className="bg-black min-h-screen flex items-center justify-center"
-      style={{ backgroundColor: "", color: "#0f0", padding: "20px" }}
-    >
-      <div className="mb-4 flex gap-4">
-        <button
-          onClick={() => setActiveChar("girl")}
-          className={`px-4 py-2 font-bold rounded ${activeChar === "girl" ? "bg-rose-500 text-white" : "bg-gray-800 text-gray-400"}`}
-        >
-          Sukeban Girl
-        </button>
-        <button
-          onClick={() => setActiveChar("cat")}
-          className={`px-4 py-2 font-bold rounded ${activeChar === "cat" ? "bg-amber-500 text-black" : "bg-gray-800 text-gray-400"}`}
-        >
-          Blooby Cat
-        </button>
-      </div>
-
-      <pre
-        ref={preRef}
-        style={{
-          fontFamily: "monospace",
-          fontSize: "12px",
-          lineHeight: "12px",
-          margin: 0,
-        }}
-      />
-      <pre
-        ref={preRef}
-        style={{
-          fontFamily: "monospace",
-          fontSize: "12px",
-          lineHeight: "12px",
-          margin: 0,
-        }}
-      />
-    </div>
+    <pre
+      ref={preRef}
+      style={{
+        fontFamily: "monospace",
+        fontSize: "12px",
+        lineHeight: "12px",
+        margin: 0,
+      }}
+    />
   );
 };
 
