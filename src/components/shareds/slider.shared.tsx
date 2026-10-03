@@ -169,7 +169,6 @@ const Slider: React.FC<AsciiCurveSliderProps> = ({
         className="absolute inset-0 w-full h-full opacity-0 z-50 cursor-grab active:cursor-grabbing"
       />
 
-      {/* Direct DOM Mutation Target */}
       <pre
         ref={preRef}
         className="font-mono text-sm leading-none text-slate-900 pointer-events-none font-bold"

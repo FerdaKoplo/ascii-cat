@@ -13,7 +13,7 @@ const ShowcasePage = () => {
       <Floor />
 
       <div className="relative flex w-full max-w-5xl items-center gap-10">
-        <div className="w-full max-w-md bg-black rounded-t-xl p-6 flex justify-center items-center overflow-hidden">
+        <div className="w-full max-w-md bg-black rounded-xl p-6 flex justify-center items-center overflow-hidden">
           <AsciiRenderMain activeChar={activeChar} />
         </div>
 
