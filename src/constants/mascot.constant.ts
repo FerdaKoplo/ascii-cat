@@ -133,27 +133,24 @@ let currentIdx = mascotFaceVertices.length;
 const hairVerts: Vec3[] = [];
 const hairMeshes: MeshGroup[] = [];
 
+// Patch 1: Sweeping Bangs
 const bangs = buildHairPatch(
   "Wolfcut Bangs",
   "#475569",
   undefined,
-  24,
-  12,
+  20,
+  10,
   currentIdx,
   (u, v) => {
-    const locks = 6;
-    // Math.pow(..., 4) creates ultra-thin spikes instead of smooth waves
-    const spike = Math.pow(Math.sin(u * Math.PI * locks), 4);
+    const locks = 5;
+    // Adding v * Math.PI creates a curve/twist to the strands as they fall
+    const swoop = Math.sin(u * Math.PI * locks + v * Math.PI * 1.5);
+    const lockDepth = swoop * 0.3 * Math.pow(v, 1.2);
 
-    const x = (u - 0.5) * 2.4;
-    const y = 1.2 - v * (0.6 + spike * 1.2); // Core length is short, spikes shoot way down
+    const x = (u - 0.5) * 2.6 + lockDepth * 0.2; // Locks drift slightly sideways
+    const y = 1.3 - v * 1.2 + Math.abs(lockDepth) * 0.5; // Jagged length
+    const z = 1.2 - Math.pow(u - 0.5, 2) * 1.2 - v * 0.2 + lockDepth * 0.8; // Deep 3D extrusion for shadows
 
-    // Spikes physically extrude forward in 3D space to catch light
-    const z =
-      1.1 +
-      Math.cos((u - 0.5) * Math.PI) * 0.2 -
-      Math.pow(v, 2) * 0.2 +
-      spike * 0.4;
     return [x, y, z];
   },
 );
@@ -161,23 +158,24 @@ hairVerts.push(...bangs.verts);
 hairMeshes.push(bangs.mesh);
 currentIdx += bangs.verts.length;
 
-// Patch 2: EXTREME Left Flare (16x16 Grid = 512 Polys)
+// Patch 2: Left Flare (Hugs cheek, swoops backward and out)
 const lFlare = buildHairPatch(
   "Wolfcut Left Flare",
   "#334155",
   undefined,
-  16,
+  14,
   16,
   currentIdx,
   (u, v) => {
     const locks = 4;
-    const spike = Math.pow(Math.sin(u * Math.PI * locks), 6); // Knife-edge locks
-    const flareOut = Math.pow(v, 2) * 1.8;
+    const swoop = Math.sin(u * Math.PI * locks - v * Math.PI); // Sweeps back away from face
+    const lockDepth = swoop * 0.4 * Math.pow(v, 1.5);
 
-    // Only the locks kick out, the core stays close to the face
-    const x = -0.7 - flareOut * (0.2 + spike * 0.8) + (u - 0.5) * 0.6;
-    const y = 0.8 - v * (1.5 + spike * 2.0);
-    const z = 0.7 - v * 0.2 + (u - 0.5) * 0.4 + spike * 0.6;
+    const flareOut = Math.pow(v, 2.5) * 1.8;
+
+    const x = -0.7 - flareOut + (u - 0.5) * 0.8 + lockDepth * 0.3;
+    const y = 0.9 - v * 3.2 + Math.abs(lockDepth) * 0.6;
+    const z = 0.8 - v * 0.3 + (u - 0.5) * 0.5 + lockDepth * 0.9;
     return [x, y, z];
   },
 );
@@ -185,21 +183,24 @@ hairVerts.push(...lFlare.verts);
 hairMeshes.push(lFlare.mesh);
 currentIdx += lFlare.verts.length;
 
+// Patch 3: Right Flare (Mirrored)
 const rFlare = buildHairPatch(
   "Wolfcut Right Flare",
   "#334155",
   undefined,
-  16,
+  14,
   16,
   currentIdx,
   (u, v) => {
     const locks = 4;
-    const spike = Math.pow(Math.sin(u * Math.PI * locks), 6);
-    const flareOut = Math.pow(v, 2) * 1.8;
+    const swoop = Math.sin(u * Math.PI * locks + v * Math.PI);
+    const lockDepth = swoop * 0.4 * Math.pow(v, 1.5);
 
-    const x = 0.7 + flareOut * (0.2 + spike * 0.8) + (u - 0.5) * 0.6;
-    const y = 0.8 - v * (1.5 + spike * 2.0);
-    const z = 0.7 - v * 0.2 - (u - 0.5) * 0.4 + spike * 0.6;
+    const flareOut = Math.pow(v, 2.5) * 1.8;
+
+    const x = 0.7 + flareOut + (u - 0.5) * 0.8 - lockDepth * 0.3;
+    const y = 0.9 - v * 3.2 + Math.abs(lockDepth) * 0.6;
+    const z = 0.8 - v * 0.3 - (u - 0.5) * 0.5 + lockDepth * 0.9;
     return [x, y, z];
   },
 );
@@ -207,28 +208,25 @@ hairVerts.push(...rFlare.verts);
 hairMeshes.push(rFlare.mesh);
 currentIdx += rFlare.verts.length;
 
-// Patch 4: EXTREME Crown (32x16 Grid = 1024 Polys)
+// Patch 4: Crown (Smooth volume with thick layered ridges)
 const crown = buildHairPatch(
   "Wolfcut Crown",
   "#1e293b",
   undefined,
-  32,
-  16,
+  24,
+  12,
   currentIdx,
   (u, v) => {
     const theta = (u - 0.5) * Math.PI * 1.7;
     const phi = v * Math.PI * 0.55;
 
-    // Creates high-frequency chaotic spikes all over the top of the head
-    const spike = Math.pow(
-      Math.abs(Math.sin(u * Math.PI * 18) * Math.sin(v * Math.PI * 10)),
-      4,
-    );
-    const r = 1.1 + spike * 0.35; // The spikes erupt off the base skull
+    // Creates broad, sweeping ridges instead of erratic noise
+    const ridge = Math.sin(u * Math.PI * 8) * Math.cos(v * Math.PI * 4) * 0.08;
+    const r = 1.18 + Math.pow(v, 2) * 0.1 + ridge;
 
     const x = Math.sin(theta) * Math.cos(phi) * r;
-    const y = 0.3 + Math.sin(phi) * r * 1.4;
-    const z = 0.15 - Math.cos(theta) * Math.cos(phi) * r;
+    const y = 0.4 + Math.sin(phi) * r * 1.35;
+    const z = 0.1 - Math.cos(theta) * Math.cos(phi) * r;
     return [x, y, z];
   },
 );
@@ -236,29 +234,29 @@ hairVerts.push(...crown.verts);
 hairMeshes.push(crown.mesh);
 currentIdx += crown.verts.length;
 
-// Patch 5: EXTREME Long Shag Mantle (32x20 Grid = 1280 Polys)
+// Patch 5: Shag Mantle (Heavy cascading shoulder locks)
 const shag = buildHairPatch(
   "Wolfcut Long Shag",
   "#0f172a",
   undefined,
-  32,
+  30,
   20,
   currentIdx,
   (u, v) => {
     const locks = 10;
-    const spike = Math.pow(Math.sin(u * Math.PI * locks), 8); // Deeply separated needle-like tails
+    // Deep swooping wave that increases in amplitude as it falls
+    const swoop = Math.sin(u * Math.PI * locks + v * Math.PI * 2.0);
+    const lockDepth = swoop * 0.6 * Math.pow(v, 1.5);
 
-    const neckTaper = 1.0 - Math.sin(v * Math.PI) * 0.3 + Math.pow(v, 2) * 2.0;
-    const x = (u - 0.5) * 2.4 * neckTaper;
+    const neckTaper = 1.2 - Math.sin(v * Math.PI) * 0.3 + Math.pow(v, 2) * 2.4;
+    const x = (u - 0.5) * 2.2 * neckTaper + lockDepth * 0.4;
 
-    // The locks drag down far past the shoulders while the gaps stay high
-    const y = 0.5 - v * (3.0 + spike * 3.5);
+    const y = 0.6 - v * 5.0 + Math.abs(lockDepth) * 0.8;
 
-    const wrapBack = Math.pow(u - 0.5, 2) * 1.5;
-    const kickOut = Math.pow(v, 2) * 1.5;
+    const wrapBack = Math.pow(u - 0.5, 2) * 1.8;
+    const kickOut = Math.pow(v, 2.2) * 2.0;
 
-    // Extrude the locks heavily into the foreground Z-space
-    const z = -0.4 - wrapBack + kickOut * spike + spike * 0.7;
+    const z = -0.5 - wrapBack + kickOut + lockDepth * 1.2;
     return [x, y, z];
   },
 );
