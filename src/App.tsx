@@ -1,9 +1,9 @@
-import AsciiCat from "./components/AsciiCat";
+import AsciiRenderMain from "./components/AsciiRenderMain";
 
 function App() {
   return (
     <>
-      <AsciiCat />
+      <AsciiRenderMain />
     </>
   );
 }
