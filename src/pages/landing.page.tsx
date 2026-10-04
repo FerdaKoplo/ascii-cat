@@ -4,7 +4,7 @@ import Button from "../components/shareds/button.shared";
 const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white text-slate-900 flex flex-col items-center justify-center p-8 gap-12 selection:bg-slate-900 selection:text-white">
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center gap-12 justify-center">
         <div className=" flex items-center justify-center border border-black rounded-xl shadow-inner overflow-hidden relative">
           <AsciiMascot />
         </div>

@@ -4,6 +4,7 @@ import { CHAR_OPTIONS } from "../constants/options.constant";
 import AsciiRenderMain from "../components/AsciiRenderMain";
 import Floor from "../components/shareds/floor.shared";
 import TitleHeader from "../components/shareds/title-header.shared";
+import Button from "../components/shareds/button.shared";
 
 const ShowcasePage = () => {
   const [activeChar, setActiveChar] = useState<"girl" | "cat">("girl");
@@ -28,6 +29,8 @@ const ShowcasePage = () => {
             activeId={activeChar}
             onChange={(id) => setActiveChar(id as "girl" | "cat")}
           />
+
+          <Button to="/">Back</Button>
         </div>
       </div>
     </div>

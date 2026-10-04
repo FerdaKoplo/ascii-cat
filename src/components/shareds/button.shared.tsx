@@ -136,11 +136,7 @@ const Button: React.FC<ButtonProps> = ({ to, children }) => {
       </div>
 
       <div className="absolute inset-0 flex flex-col justify-center items-center pointer-events-none z-10">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight uppercase [-webkit-text-stroke:1px_#0f172a] text-transparent relative z-10 group-hover:scale-110 group-hover:tracking-widest transition-all duration-500 ease-out">
-          {children}
-        </h1>
-
-        <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl md:text-5xl font-bold tracking-tight text-slate-900 uppercase z-20 w-full text-center group-hover:scale-110 group-hover:tracking-widest transition-all duration-500 ease-out">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 uppercase z-20 w-full text-center group-hover:scale-110 group-hover:tracking-widest transition-all duration-500 ease-out">
           {children}
         </h1>
       </div>
