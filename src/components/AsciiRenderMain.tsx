@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import {
   catVertices,
   dotProduct,
-  girlVertices,
   normalize,
   type Face,
   type Vec3,
