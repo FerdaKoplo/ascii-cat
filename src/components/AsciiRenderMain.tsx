@@ -10,8 +10,11 @@ import {
 import { render3D, rotateYAxis } from "../libs/camera.lib";
 import { calculateNormal, fillTriangle } from "../libs/calculate.lib";
 import { getShadeChar } from "../libs/lighting.lib";
-import { girlMeshes } from "../constants/girl-punk.constant";
 import { catMeshes } from "../constants/blooby-cat.constant";
+import {
+  sekubanGirlMeshes,
+  sekubanGirlVertices,
+} from "../constants/sekuban-girl.constant";
 
 interface AsciiRenderMainProps {
   activeChar: "girl" | "cat";
@@ -23,8 +26,9 @@ const SCREEN_HEIGHT = 60;
 const AsciiRenderMain: React.FC<AsciiRenderMainProps> = ({ activeChar }) => {
   const preRef = useRef<HTMLPreElement>(null);
 
-  const currentVertices = activeChar === "girl" ? girlVertices : catVertices;
-  const currentMeshes = activeChar === "girl" ? girlMeshes : catMeshes;
+  const currentVertices =
+    activeChar === "girl" ? sekubanGirlVertices : catVertices;
+  const currentMeshes = activeChar === "girl" ? sekubanGirlMeshes : catMeshes;
 
   useEffect(() => {
     let angle = 0;
@@ -76,7 +80,6 @@ const AsciiRenderMain: React.FC<AsciiRenderMainProps> = ({ activeChar }) => {
         });
       });
 
-      // slice one dimensional array into printable row
       let htmlString = "";
       let activeColor = "";
 
@@ -121,10 +124,12 @@ const AsciiRenderMain: React.FC<AsciiRenderMainProps> = ({ activeChar }) => {
     <pre
       ref={preRef}
       style={{
-        fontFamily: "monospace",
-        fontSize: "12px",
-        lineHeight: "12px",
+        fontFamily: "'Courier New', Courier, monospace",
+        fontSize: "10px",
+        lineHeight: "10px",
         margin: 0,
+        backgroundColor: "#05050a",
+        overflow: "hidden",
       }}
     />
   );
