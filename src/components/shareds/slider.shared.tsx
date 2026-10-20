@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { render3D } from "../../libs/camera.lib";
 import { getShadeChar } from "../../libs/lighting.lib";
 
@@ -15,14 +15,16 @@ interface AsciiCurveSliderProps {
 
 const WIDTH = 64;
 const HEIGHT = 24;
-const RADIUS = 4.5;
+const RADIUS = 4.2;
 
 const Slider: React.FC<AsciiCurveSliderProps> = ({
   options,
   activeId,
   onChange,
 }) => {
-  const activeIndex = options.findIndex((o) => o.id === activeId);
+  const rawIndex = options.findIndex((o) => o.id === activeId);
+  const activeIndex = rawIndex >= 0 ? rawIndex : 0;
+
   const [dragDir, setDragDir] = useState<"left" | "right" | null>(null);
 
   const preRef = useRef<HTMLPreElement>(null);
@@ -56,10 +58,10 @@ const Slider: React.FC<AsciiCurveSliderProps> = ({
 
     const drawString = (str: string, cx: number, cy: number, cz: number) => {
       const [screenX, screenY, adjustedZ] = render3D(cx, cy, cz, WIDTH, HEIGHT);
-      const startX = screenX - Math.floor(str.length / 2);
+      const startXPos = screenX - Math.floor(str.length / 2);
 
       for (let i = 0; i < str.length; i++) {
-        const px = startX + i;
+        const px = startXPos + i;
         if (
           px >= 0 &&
           px < WIDTH &&
@@ -68,7 +70,8 @@ const Slider: React.FC<AsciiCurveSliderProps> = ({
           adjustedZ > 0
         ) {
           const idx = screenY * WIDTH + px;
-          if (adjustedZ <= zBuffer[idx]) {
+          // Only draw non-space characters over lower priority elements
+          if (str[i] !== " " && adjustedZ <= zBuffer[idx]) {
             zBuffer[idx] = adjustedZ;
             grid[idx] = str[i];
           }
@@ -83,9 +86,14 @@ const Slider: React.FC<AsciiCurveSliderProps> = ({
       grid.fill(" ");
       zBuffer.fill(9999);
 
+      const spacingAngle = (Math.PI * 2) / Math.max(options.length, 3);
+      const currentAngleOffset = vIndex * spacingAngle;
+
+      // 1. Draw 3D Rotating Cylinder Wireframe synced with options
       for (let a = 0; a < Math.PI * 2; a += 0.08) {
-        const x = Math.sin(a + vIndex) * RADIUS;
-        const z = -Math.cos(a + vIndex) * RADIUS;
+        const rotA = a - currentAngleOffset;
+        const x = Math.sin(rotA) * RADIUS;
+        const z = -Math.cos(rotA) * RADIUS;
         const brightness = Math.max(0, 1 - (z + RADIUS) / (RADIUS * 2));
         const char = getShadeChar(brightness);
 
@@ -96,21 +104,25 @@ const Slider: React.FC<AsciiCurveSliderProps> = ({
         drawPoint(x, hY, z, brightness > 0.5 ? "+" : ".");
         drawPoint(x, -hY, z, brightness > 0.5 ? "x" : ".");
       }
-      const spacingAngle = (Math.PI * 2) / Math.max(options.length, 6);
 
+      // 2. Draw Options Carousel (Only front-facing labels to prevent text collision)
       options.forEach((opt, i) => {
         const baseAngle = (i - vIndex) * spacingAngle;
+        const cosAngle = Math.cos(baseAngle);
         const px = Math.sin(baseAngle) * RADIUS;
-        const pz = -Math.cos(baseAngle) * RADIUS;
+        const pz = -cosAngle * RADIUS;
 
-        if (pz < RADIUS * 0.5) {
-          const isActive = Math.abs(i - vIndex) < 0.1;
-          const text = isActive ? `► ${opt.label.toUpperCase()} ◄` : opt.label;
+        // Only render labels within the front-facing 140° viewing cone
+        if (cosAngle > 0.25) {
+          const isSelected = Math.abs(i - vIndex) < 0.25;
+          const text = isSelected
+            ? `► ${opt.label.toUpperCase()} ◄`
+            : opt.label;
 
           drawString(text, px, 0, pz - 0.5);
 
-          if (isActive) {
-            drawString("▔".repeat(text.length - 4), px, 0.4, pz - 0.5);
+          if (isSelected) {
+            drawString("▔".repeat(text.length - 2), px, 0.45, pz - 0.5);
           }
         }
       });
@@ -135,7 +147,9 @@ const Slider: React.FC<AsciiCurveSliderProps> = ({
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newIndex = parseInt(e.target.value, 10);
-    onChange(options[newIndex].id);
+    if (options[newIndex]) {
+      onChange(options[newIndex].id);
+    }
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -159,7 +173,7 @@ const Slider: React.FC<AsciiCurveSliderProps> = ({
       <input
         type="range"
         min={0}
-        max={options.length - 1}
+        max={Math.max(0, options.length - 1)}
         value={activeIndex}
         onChange={handleSliderChange}
         onPointerDown={handlePointerDown}
@@ -174,7 +188,7 @@ const Slider: React.FC<AsciiCurveSliderProps> = ({
         className="font-mono text-sm leading-none text-slate-900 pointer-events-none font-bold"
       />
 
-      <div className="w-full flex justify-center pointer-events-none opacity-40 font-mono text-sm tracking-widest text-slate-400 mt-4">
+      <div className="w-full flex justify-center pointer-events-none opacity-60 font-mono text-sm tracking-widest text-slate-500 mt-4 gap-1">
         [
         {options.map((_, i) => (
           <span

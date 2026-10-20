@@ -14,9 +14,13 @@ import {
   sekubanGirlMeshes,
   sekubanGirlVertices,
 } from "../constants/sekuban-girl.constant";
+import {
+  skaterGirlMeshes,
+  skaterGirlVertices,
+} from "../constants/skater-girl.constant";
 
 interface AsciiRenderMainProps {
-  activeChar: "girl" | "cat";
+  activeChar: "skater" | "sukeban" | "cat";
 }
 
 const SCREEN_WIDTH = 70;
@@ -26,8 +30,18 @@ const AsciiRenderMain: React.FC<AsciiRenderMainProps> = ({ activeChar }) => {
   const preRef = useRef<HTMLPreElement>(null);
 
   const currentVertices =
-    activeChar === "girl" ? sekubanGirlVertices : catVertices;
-  const currentMeshes = activeChar === "girl" ? sekubanGirlMeshes : catMeshes;
+    activeChar === "skater"
+      ? skaterGirlVertices
+      : activeChar === "sukeban"
+        ? sekubanGirlVertices
+        : catVertices;
+
+  const currentMeshes =
+    activeChar === "skater"
+      ? skaterGirlMeshes
+      : activeChar === "sukeban"
+        ? sekubanGirlMeshes
+        : catMeshes;
 
   useEffect(() => {
     let angle = 0;

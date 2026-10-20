@@ -7,7 +7,9 @@ import TitleHeader from "../components/shareds/title-header.shared";
 import Button from "../components/shareds/button.shared";
 
 const ShowcasePage = () => {
-  const [activeChar, setActiveChar] = useState<"girl" | "cat">("girl");
+  const [activeChar, setActiveChar] = useState<"skater" | "sukeban" | "cat">(
+    "skater",
+  );
 
   return (
     <div className="relative min-h-screen bg-white text-gray-900 flex flex-col items-center justify-center py-12 px-4">
@@ -27,7 +29,7 @@ const ShowcasePage = () => {
           <Slider
             options={CHAR_OPTIONS}
             activeId={activeChar}
-            onChange={(id) => setActiveChar(id as "girl" | "cat")}
+            onChange={(id) => setActiveChar(id as "skater" | "sukeban" | "cat")}
           />
 
           <Button to="/">Back</Button>
